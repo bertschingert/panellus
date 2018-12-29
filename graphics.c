@@ -81,7 +81,8 @@ void draw_data(int *display_values, uint cols, uint rows) {
 }
 
 void display_periodic_output(float *file_buffer, uint64_t *file_offset,
-                            uint64_t file_buf_size, uint sample_rate) {
+                            uint64_t file_buf_size, uint sample_rate,
+                            uint channels) {
     double *in;
     fftw_complex *out;
     fftw_plan p;
@@ -95,7 +96,7 @@ void display_periodic_output(float *file_buffer, uint64_t *file_offset,
 
      while(*file_offset < file_buf_size) {
         for(int i = 0; i < FFT_BUF_SIZE; i++) {
-            in[i] = hann_window[i] * (double) file_buffer[*file_offset + 2 * i];
+            in[i] = hann_window[i] * (double) file_buffer[*file_offset + channels * i];
         }
         fftw_execute(p);
         uint cols = num_display_cols();
@@ -136,7 +137,8 @@ void graphics_entrypoint(void *args) {
     display_periodic_output(graphics_args->file_buffer,
                         graphics_args->file_offset,
                         graphics_args->file_buf_size,
-                        graphics_args->sample_rate);
+                        graphics_args->sample_rate,
+                        graphics_args->channels);
 
     screen_cleanup();
 }

@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "audio.h"
 
 int set_alsa_hw_params(snd_pcm_t *handle, snd_pcm_uframes_t *buffer_size,
-                        uint *sample_rate) {
+                        uint channels, uint *sample_rate) {
     int dir;
     int err;
     snd_pcm_uframes_t frames = 256;
@@ -46,7 +46,7 @@ int set_alsa_hw_params(snd_pcm_t *handle, snd_pcm_uframes_t *buffer_size,
         fprintf(stderr, "unable to set format: %s\n", snd_strerror(err));
         return -1;
     }
-    err = snd_pcm_hw_params_set_channels(handle, params, 2);
+    err = snd_pcm_hw_params_set_channels(handle, params, channels);
     if (err < 0) {
         fprintf(stderr, "unable to set channels: %s\n", snd_strerror(err));
         return -1;
@@ -79,17 +79,17 @@ int set_alsa_hw_params(snd_pcm_t *handle, snd_pcm_uframes_t *buffer_size,
 
 int play_sound(snd_pcm_t *handle,
                 uint alsa_buf_size,
-                float *audio_buffer,
+                uint channels,
+                float *file_buffer,
                 uint64_t file_buf_size,
                 uint64_t *file_offset) {
-    float *index = audio_buffer;
+    float *index = file_buffer;
     while(*file_offset < file_buf_size) {
         if (snd_pcm_writei(handle, index, alsa_buf_size) < 0) {
             snd_pcm_prepare(handle);
-            //fprintf(stderr, "buffer underrun\n");
         }
-        *file_offset += 2 * alsa_buf_size;
-        index += 2 * alsa_buf_size;
+        *file_offset += channels * alsa_buf_size;
+        index += channels * alsa_buf_size;
     }
     return 0;
 }
@@ -98,6 +98,7 @@ void *audio_entrypoint(void *args) {
     struct global_info *audio_args = (struct global_info *) args;
     play_sound(audio_args->alsa_handle,
                 audio_args->alsa_buf_size,
+                audio_args->channels,
                 audio_args->file_buffer,
                 audio_args->file_buf_size,
                 audio_args->file_offset);

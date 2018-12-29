@@ -65,8 +65,9 @@ int main(int argc, char *argv[]) {
     }
 
     uint sample_rate = sfinfo.samplerate;
+    uint channels = sfinfo.channels;
     snd_pcm_uframes_t alsa_buffer_size = DFT_FRAMES_PER_BUFFER;
-    if (set_alsa_hw_params(handle, &alsa_buffer_size, &sample_rate) != 0) {
+    if (set_alsa_hw_params(handle, &alsa_buffer_size, channels, &sample_rate) != 0) {
         return -1;
     }
 
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
     global_info.alsa_handle = handle;
     global_info.alsa_buf_size = alsa_buffer_size;
     global_info.sample_rate = sample_rate;
+    global_info.channels = channels;
     global_info.file_buffer = file_buffer;
     global_info.file_buf_size = file_buffer_size;
     global_info.file_offset = &file_offset;

@@ -24,10 +24,11 @@ struct global_info {
     snd_pcm_t *alsa_handle;
     uint alsa_buf_size;
     uint sample_rate;
+    uint channels;
     float *file_buffer;
     uint64_t file_buf_size;
     uint64_t *file_offset;  /* keeps track of playback position */
 };
 
-int set_alsa_hw_params(snd_pcm_t *handle, snd_pcm_uframes_t *buffer_size, uint *sample_rate);
+int set_alsa_hw_params(snd_pcm_t *handle, snd_pcm_uframes_t *buffer_size, uint channels, uint *sample_rate);
 void *audio_entrypoint(void *args);
