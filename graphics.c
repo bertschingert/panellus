@@ -39,7 +39,7 @@ uint complex_abs(double a, double b) {
 
 uint num_display_cols() {
     int n = FFT_BUF_SIZE / 2;
-    // COLS is ncurses global
+    // COLS is ncurses global for width of screen
     return (n < COLS) ? n : COLS;
 }
 
@@ -100,7 +100,7 @@ void display_periodic_output(float *file_buffer, uint64_t *file_offset,
         }
         fftw_execute(p);
         uint cols = num_display_cols();
-        uint rows = LINES - 1; // LINES is ncurses global
+        uint rows = LINES - 1; // LINES is ncurses global for height of screen
         transform_fft_output_for_display(out, sample_rate, display_values,
                                         cols, rows);
         draw_data(display_values, cols, rows);
